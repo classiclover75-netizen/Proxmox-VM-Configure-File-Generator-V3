@@ -193,7 +193,11 @@ export default function App() {
   const cd3Port = scsiMode ? 'sata2' : 'sata3';
 
   // Output 1: Delete CD-ROMs
-  const cdDelCmd = `qm set ${inputs.vmId} --delete ${cd1Port} --delete ${cd2Port} --delete ${cd3Port}`;
+  const safeVmId = inputs.vmId?.trim() || '<vmId>';
+  const safeCd1 = cd1Port || 'sata1';
+  const safeCd2 = cd2Port || 'sata2';
+  const safeCd3 = cd3Port || 'sata3';
+  const cdDelCmd = `qm set ${safeVmId} --delete ${safeCd1} --delete ${safeCd2} --delete ${safeCd3}`;
 
   // Common Args
   const getCommonArgs = () => {
