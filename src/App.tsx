@@ -10,6 +10,7 @@ import { getAlNum, getDate, getHex } from './lib/utils';
 import { sanitizeCpuFlags } from './lib/cpuSafety';
 import { getIntelSignature } from './lib/intelCpuid';
 import { selectHardwareIdentity } from './lib/cpuVendorFilter';
+import { getCpuModelList } from './lib/cpuModelList';
 import { CodePanel } from './components/CodePanel';
 import { Copy, RefreshCw, Download, Check, Shield, Server, HardDrive, Cpu, AlertCircle, Terminal, HelpCircle, History, Trash2 } from "lucide-react";
 
@@ -22,6 +23,7 @@ const INITIAL_INPUTS: AppInputs = {
   brandSelect: 'random',
   cpuVendor: 'random',
   cpuArch: 'default',
+  cpuModel: 'auto',
   cd1: 'local:iso/virtio-win-0.1.285.iso,media=cdrom',
   cd2: 'local:iso/unattend-2026.iso,media=cdrom',
   cd3: 'local:iso/Win10_22H2_English_x64v1.iso,media=cdrom',
@@ -99,7 +101,8 @@ export default function App() {
       currentInputs.brandSelect,
       currentInputs.typeSelect,
       currentInputs.cpuVendor,
-      currentInputs.cpuArch
+      currentInputs.cpuArch,
+      currentInputs.cpuModel
     );
 
     if (!selectedHardware) {
@@ -474,7 +477,7 @@ echo "You can now start the VM from Proxmox GUI."
             title="Select CPU Vendor"
             className={`bg-[#dfe6e9] text-[#2d3436] p-3 border-none rounded-md text-[15px] font-bold cursor-pointer outline-none transition-all ${isDef('cpuVendor') ? 'ring-2 ring-[#fdcb6e] shadow-[0_0_8px_rgba(253,203,110,0.3)]' : ''}`}
             value={inputs.cpuVendor}
-            onChange={(e) => { handleChange('cpuVendor', e.target.value); handleChange('cpuArch', 'default'); generateIdentity(false, { ...inputs, cpuVendor: e.target.value, cpuArch: 'default' }); }}
+            onChange={(e) => { handleChange('cpuVendor', e.target.value); handleChange('cpuArch', 'default'); handleChange('cpuModel', 'auto'); generateIdentity(false, { ...inputs, cpuVendor: e.target.value, cpuArch: 'default', cpuModel: 'auto' }); }}
           >
             <option value="random">Random CPU Vendor{defaults.cpuVendor === 'random' && ' (Default)'}</option>
             <option value="intel">Intel{defaults.cpuVendor === 'intel' && ' (Default)'}</option>
@@ -484,7 +487,7 @@ echo "You can now start the VM from Proxmox GUI."
             title="Select CPU Architecture"
             className={`bg-[#dfe6e9] text-[#2d3436] p-3 border-none rounded-md text-[15px] font-bold cursor-pointer outline-none transition-all ${isDef('cpuArch') ? 'ring-2 ring-[#fdcb6e] shadow-[0_0_8px_rgba(253,203,110,0.3)]' : ''}`}
             value={inputs.cpuArch}
-            onChange={(e) => { handleChange('cpuArch', e.target.value); generateIdentity(false, { ...inputs, cpuArch: e.target.value }); }}
+            onChange={(e) => { handleChange('cpuArch', e.target.value); handleChange('cpuModel', 'auto'); generateIdentity(false, { ...inputs, cpuArch: e.target.value, cpuModel: 'auto' }); }}
             disabled={inputs.cpuVendor === 'random'}
           >
             {inputs.cpuVendor === 'intel' && (
@@ -501,6 +504,18 @@ echo "You can now start the VM from Proxmox GUI."
                 <option value="EPYC-Milan">EPYC-Milan — Zen3 (Vermeer/Cezanne){defaults.cpuArch === 'EPYC-Milan' && ' (Default)'}</option>
               </>
             )}
+          </select>
+          <select
+            title="Select CPU Model"
+            className={`bg-[#dfe6e9] text-[#2d3436] p-3 border-none rounded-md text-[15px] font-bold cursor-pointer outline-none transition-all ${isDef('cpuModel') ? 'ring-2 ring-[#fdcb6e] shadow-[0_0_8px_rgba(253,203,110,0.3)]' : ''}`}
+            value={inputs.cpuModel}
+            onChange={(e) => { handleChange('cpuModel', e.target.value); generateIdentity(false, { ...inputs, cpuModel: e.target.value }); }}
+            disabled={inputs.cpuVendor === 'random'}
+          >
+            <option value="auto">Auto (Random CPU){defaults.cpuModel === 'auto' && ' (Default)'}</option>
+            {inputs.cpuVendor !== 'random' && getCpuModelList(pcDB, inputs.cpuVendor, inputs.cpuArch).map(cpuName => (
+              <option key={cpuName} value={cpuName}>{cpuName}{defaults.cpuModel === cpuName && ' (Default)'}</option>
+            ))}
           </select>
 
           {blockedCombo && (

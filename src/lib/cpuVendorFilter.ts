@@ -5,9 +5,15 @@ export function selectHardwareIdentity(
   brandSelect: string,
   typeSelect: string,
   cpuVendor: string,
-  cpuArch: string = 'default'
+  cpuArch: string = 'default',
+  cpuModel: string = 'auto'
 ): { brand: PcBrand; model: PcModel; emulatedCpu: any } | null {
   const isCpuMatch = (cpu: any) => {
+    // If user explicitly requests a CPU model, must match its name exactly
+    if (cpuModel !== 'auto' && cpu.name !== cpuModel) {
+      return false;
+    }
+
     if (cpuVendor === 'intel') {
       return cpu.base === 'Skylake-Client-noTSX-IBRS';
     }
@@ -41,7 +47,12 @@ export function selectHardwareIdentity(
     validModels: pcDB[key] ? filterModels(pcDB[key], typeSelect) : []
   })).filter(b => b.validModels.length > 0);
 
-  // If no combination is valid, return null instead of falling back and silently swapping
+  // If no combination is valid with a specific cpuModel, fall back safely to 'auto'
+  if (validBrands.length === 0 && cpuModel !== 'auto') {
+    return selectHardwareIdentity(pcDB, brandSelect, typeSelect, cpuVendor, cpuArch, 'auto');
+  }
+
+  // If no combination is valid even with 'auto', return null instead of falling back
   if (validBrands.length === 0) {
     return null;
   }

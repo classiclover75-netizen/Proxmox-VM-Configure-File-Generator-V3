@@ -36,6 +36,7 @@ export interface AppInputs {
   brandSelect: string;
   cpuVendor: string;
   cpuArch: string;
+  cpuModel: string;
   cd1: string;
   cd2: string;
   cd3: string;
