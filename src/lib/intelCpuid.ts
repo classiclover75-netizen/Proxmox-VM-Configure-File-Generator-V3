@@ -11,8 +11,6 @@ const intelSignatures: Record<string, CpuSignature> = {
   "Coffee Lake Refresh": { family: 6, model: 158, stepping: 13 },
   "Coffee Lake": { family: 6, model: 158, stepping: 10 },
   "Skylake": { family: 6, model: 94, stepping: 3 },
-  "Broadwell": { family: 6, model: 61, stepping: 4 },
-  "Broadwell-E": { family: 6, model: 79, stepping: 1 },
 };
 
 export function getIntelSignature(codename: string): CpuSignature {

@@ -214,7 +214,7 @@ export default function App() {
     const hvVendorId = (identity.emulatedCpu.base === 'EPYC' || identity.emulatedCpu.base === 'EPYC-Milan') ? 'AuthenticAMD' : 'GenuineIntel';
     let cpuArgsStr = `${identity.emulatedCpu.base},+aes,-hypervisor,kvm=off,hv_vendor_id=${hvVendorId},hv_relaxed,hv_spinlocks=0x1fff,hv_vapic,hv_time,model-id=${identity.emulatedCpu.name}`;
     
-    if (identity.emulatedCpu.base.startsWith('Skylake-Client') || identity.emulatedCpu.base.startsWith('Broadwell')) {
+    if (identity.emulatedCpu.base.startsWith('Skylake-Client')) {
       const sig = getIntelSignature(identity.emulatedCpu.codename);
       cpuArgsStr += `,family=${sig.family},model=${sig.model},stepping=${sig.stepping}`;
     }
@@ -491,7 +491,6 @@ echo "You can now start the VM from Proxmox GUI."
               <>
                 <option value="default">Skylake-Client-noTSX-IBRS (v3){defaults.cpuArch === 'default' && ' (Default)'}</option>
                 <option value="Skylake-Client-v4">Skylake-Client-v4{defaults.cpuArch === 'Skylake-Client-v4' && ' (Default)'}</option>
-                <option value="Broadwell">Broadwell (5th gen / Broadwell-E){defaults.cpuArch === 'Broadwell' && ' (Default)'}</option>
               </>
             )}
             {inputs.cpuVendor === 'random' && <option value="default">Auto</option>}

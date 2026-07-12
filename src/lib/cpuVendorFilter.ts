@@ -9,7 +9,6 @@ export function selectHardwareIdentity(
 ): { brand: PcBrand; model: PcModel; emulatedCpu: any } | null {
   const isCpuMatch = (cpu: any) => {
     if (cpuVendor === 'intel') {
-      if (cpuArch === 'Broadwell') return cpu.base === 'Broadwell-noTSX-IBRS';
       return cpu.base === 'Skylake-Client-noTSX-IBRS';
     }
     if (cpuVendor === 'amd') {
