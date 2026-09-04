@@ -18,8 +18,8 @@ export function selectHardwareIdentity(
       return cpu.base === 'Skylake-Client-noTSX-IBRS';
     }
     if (cpuVendor === 'amd') {
-      if (cpuArch === 'EPYC') return cpu.base === 'EPYC';
-      if (cpuArch === 'EPYC-Milan') return cpu.base === 'EPYC-Milan';
+      if (cpuArch === 'EPYC' || cpuArch.startsWith('EPYC-Rome')) return cpu.base === 'EPYC';
+      if (cpuArch === 'EPYC-Milan' || cpuArch === 'EPYC-Milan-v2') return cpu.base === 'EPYC-Milan';
       return cpu.base === 'EPYC' || cpu.base === 'EPYC-Milan';
     }
     return true;
@@ -71,6 +71,12 @@ export function selectHardwareIdentity(
 
   if (cpuVendor === 'intel' && cpuArch === 'Skylake-Client-v4') {
     emulatedCpu = { ...emulatedCpu, base: 'Skylake-Client-v4' };
+  }
+  if (cpuVendor === 'amd' && cpuArch === 'EPYC-Milan-v2') {
+    emulatedCpu = { ...emulatedCpu, base: 'EPYC-Milan-v2' };
+  }
+  if (cpuVendor === 'amd' && cpuArch.startsWith('EPYC-Rome')) {
+    emulatedCpu = { ...emulatedCpu, base: cpuArch };
   }
 
   return { brand, model, emulatedCpu };

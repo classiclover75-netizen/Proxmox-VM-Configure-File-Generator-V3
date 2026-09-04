@@ -214,7 +214,7 @@ export default function App() {
       diskGlobalArg = `-global ide-hd.model="${identity.dVendor} ${identity.dModel}"`;
     }
 
-    const hvVendorId = (identity.emulatedCpu.base === 'EPYC' || identity.emulatedCpu.base === 'EPYC-Milan') ? 'AuthenticAMD' : 'GenuineIntel';
+    const hvVendorId = identity.emulatedCpu.base.startsWith('EPYC') ? 'AuthenticAMD' : 'GenuineIntel';
     let cpuArgsStr = `${identity.emulatedCpu.base},+aes,-hypervisor,kvm=off,hv_vendor_id=${hvVendorId},hv_relaxed,hv_spinlocks=0x1fff,hv_vapic,hv_time,model-id=${identity.emulatedCpu.name}`;
     
     if (identity.emulatedCpu.base.startsWith('Skylake-Client')) {
@@ -501,7 +501,12 @@ echo "You can now start the VM from Proxmox GUI."
               <>
                 <option value="default">Auto (Zen2 or Zen3){defaults.cpuArch === 'default' && ' (Default)'}</option>
                 <option value="EPYC">EPYC — Zen2 (Matisse){defaults.cpuArch === 'EPYC' && ' (Default)'}</option>
+                <option value="EPYC-Rome">EPYC-Rome — Zen2{defaults.cpuArch === 'EPYC-Rome' && ' (Default)'}</option>
+                <option value="EPYC-Rome-v2">EPYC-Rome-v2 — Zen2{defaults.cpuArch === 'EPYC-Rome-v2' && ' (Default)'}</option>
+                <option value="EPYC-Rome-v3">EPYC-Rome-v3 — Zen2{defaults.cpuArch === 'EPYC-Rome-v3' && ' (Default)'}</option>
+                <option value="EPYC-Rome-v4">EPYC-Rome-v4 — Zen2{defaults.cpuArch === 'EPYC-Rome-v4' && ' (Default)'}</option>
                 <option value="EPYC-Milan">EPYC-Milan — Zen3 (Vermeer/Cezanne){defaults.cpuArch === 'EPYC-Milan' && ' (Default)'}</option>
+                <option value="EPYC-Milan-v2">EPYC-Milan-v2 — Zen3 (Vermeer/Cezanne){defaults.cpuArch === 'EPYC-Milan-v2' && ' (Default)'}</option>
               </>
             )}
           </select>
