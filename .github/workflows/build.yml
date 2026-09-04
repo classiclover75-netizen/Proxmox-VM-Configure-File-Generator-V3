@@ -1,0 +1,51 @@
+name: Build Windows App
+
+# Jab bhi main branch par push ho, yeh workflow automatically chalega
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch: # Manually bhi "Run workflow" button se trigger kar sakte hain
+
+jobs:
+  build-windows:
+    runs-on: windows-latest
+
+    steps:
+      # 1. Repo ka code checkout karein
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      # 2. Node.js setup karein
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      # 3. Rust setup karein (Tauri ko chahiye)
+      - name: Setup Rust
+        uses: dtolnay/rust-toolchain@stable
+
+      # 4. Rust build cache (taake future builds fast hon)
+      - name: Rust cache
+        uses: swatinem/rust-cache@v2
+        with:
+          workspaces: "./src-tauri -> target"
+
+      # 5. npm dependencies install karein
+      - name: Install dependencies
+        run: npm install
+
+      # 6. Tauri app build karein aur GitHub Release par upload karein
+      - name: Build Tauri app
+        uses: tauri-apps/tauri-action@v0
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          # Agar Gemini API key build ke waqt chahiye ho to yahan secret add karein:
+          # GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+        with:
+          tagName: app-v__VERSION__
+          releaseName: "App v__VERSION__"
+          releaseBody: "Naya build automatically GitHub Actions se banaya gaya."
+          releaseDraft: true
+          prerelease: false
