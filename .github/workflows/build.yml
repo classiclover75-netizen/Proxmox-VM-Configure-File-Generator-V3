@@ -33,8 +33,14 @@ jobs:
           workspaces: "./src-tauri -> target"
 
       # 5. npm dependencies install karein
+      # (package-lock.json aur node_modules hata kar fresh install — rollup ke
+      #  platform-specific optional-dependency bug se bachne ke liye)
       - name: Install dependencies
-        run: npm install
+        shell: pwsh
+        run: |
+          if (Test-Path package-lock.json) { Remove-Item package-lock.json }
+          if (Test-Path node_modules) { Remove-Item -Recurse -Force node_modules }
+          npm install
 
       # 6. Tauri app build karein aur GitHub Release par upload karein
       - name: Build Tauri app
