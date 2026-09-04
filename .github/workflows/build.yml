@@ -44,6 +44,7 @@ jobs:
 
       # 6. Tauri app build karein aur GitHub Release par upload karein
       - name: Build Tauri app
+        id: tauri_build
         uses: tauri-apps/tauri-action@v0
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -55,3 +56,22 @@ jobs:
           releaseBody: "Naya build automatically GitHub Actions se banaya gaya."
           releaseDraft: true
           prerelease: false
+
+      # 7. App ka version nikalein (release tag banane ke liye zaroori hai)
+      - name: Get app version
+        id: appversion
+        shell: pwsh
+        run: |
+          $json = Get-Content src-tauri/tauri.conf.json | ConvertFrom-Json
+          "version=$($json.version)" >> $env:GITHUB_OUTPUT
+
+      # 8. Raw (no-install) portable exe ko naya naam de kar copy karein
+      - name: Prepare portable exe
+        shell: pwsh
+        run: Copy-Item "src-tauri/target/release/app.exe" "src-tauri/target/release/ProxmoxVMConfigGenerator-Portable.exe"
+
+      # 9. Portable exe ko usi Release mein extra asset ke tor par upload karein
+      - name: Upload portable exe to release
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: gh release upload app-v${{ steps.appversion.outputs.version }} "src-tauri/target/release/ProxmoxVMConfigGenerator-Portable.exe" --repo ${{ github.repository }} --clobber
